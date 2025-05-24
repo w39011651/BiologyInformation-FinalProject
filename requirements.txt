@@ -1,0 +1,4 @@
+triton==2.3.1
+transformers==4.51.3
+numpy
+flask
