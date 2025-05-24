@@ -1,0 +1,6 @@
+tqdm
+numpy
+flask
+biopython
+scikit-learn
+Flask-Mail
