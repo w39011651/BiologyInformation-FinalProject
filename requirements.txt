@@ -1,0 +1,7 @@
+tqdm
+numpy
+flask
+biopython
+scikit-learn
+joblib
+torch
