@@ -1,1 +1,3 @@
 *.pyc
+*.Identifier
+mamba_atp_binding_model.pt

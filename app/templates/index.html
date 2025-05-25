@@ -1,18 +1,72 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>FASTA Demo</title>
-</head>
-<body>
-    <h2>FASTA Prediction Demo</h2>
-    <form method="POST">
-        <textarea name="fasta_input" rows="10" cols="50" placeholder=">Protein\nMSTNPKPQRKTKRNTNRRP..."></textarea><br><br>
-        <input type="submit" value="Send">
-    </form>
+{% extends "base.html" %}
+{% block title %}ATP Binding Sites Predictor{% endblock %}
 
-    {% if result %}
-        <h3>Prediction Result:</h3>
-        <p>{{ result }}</p>
+{% block hero %}
+  <div class="hero-section text-white text-center">
+    <h1 class="hero-title">ATP Binding Sites Predictor</h1>
+    <h2 class="hero-subtitle">A web server for predicting ATP binding sites in protein sequences using classifiers and deep learning</h2>
+  </div>
+{% endblock %}
+
+{% block content %}
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div class="alert alert-success" role="alert">
+        {{ messages[0] }}
+      </div>
     {% endif %}
-</body>
-</html>
+  {% endwith %}
+
+    <div class="mb-5">
+      <h3>Introduction</h3>
+      <p>This project aims to address the inefficiencies and high costs associated with experimentally identifying ATP binding sites in protein sequences. 
+        We developed a web-based prediction platform that leverages deep learning techniques to automatically identify potential ATP binding sites from raw protein sequences. 
+        This tool supports research in structural biology and drug discovery by improving early-stage target screening efficiency and reducing laboratory workload.
+      </p>
+    </div>
+
+    <div class="mb-5">
+      <h3>Approach</h3>
+      <p>Our approach integrates advanced deep learning models to enhance prediction accuracy. Specifically, 
+        we employ Convolutional Neural Networks (CNN) for spatial feature extraction, the Evolutionary Scale Modeling (ESM) protein language model for capturing evolutionary context, 
+        and the Mamba architecture for efficient sequence modeling. These models are trained on curated datasets derived from publicly available protein structure and function databases. 
+        The development process includes data preprocessing, model training and validation, user interface prototyping, and multiple rounds of usability testing. 
+        The result is an intuitive and powerful tool for ATP binding site prediction.</p>
+    </div>
+
+    <div class="mb-5">
+      <h3>Dataset</h3>
+      <p>All the dataset are searched from Uniprot. If you are trying to train your model with the same dataset, please check the link below.</p>
+      <p><a href="https://rest.uniprot.org/uniprotkb/stream?download=true&format=fasta&query=%28%28go%3A0005524%29+AND+%28fragment%3Afalse%29+AND+%28keyword%3AKW-0813%29+AND+%28reviewed%3Atrue%29+AND+%28existence%3A1%29%29"; style="text-decoration: none; color: #6bcdfe;">FASTA</a> , <a href="https://rest.uniprot.org/uniprotkb/stream?download=true&format=json&query=%28%28go%3A0005524%29+AND+%28fragment%3Afalse%29+AND+%28keyword%3AKW-0813%29+AND+%28reviewed%3Atrue%29+AND+%28existence%3A1%29%29"; style="text-decoration: none; color: #6bcdfe;">Json</a></p>
+    </div>
+
+    <div class="mb-5">
+      <h3>Member</h3>
+      <ul>
+        <li>1111437 張原翔</li>
+        <li>1111535 陳奕宏</li>
+        <li>1111537 簡至揚</li>
+        <li>1113314 蔣碩文</li>
+      </ul>
+    </div>
+
+    <div class="mb-5">
+      <h3>Contact us</h3>
+<form method="post" action="{{ url_for('contact') }}">
+        <div class="mb-3">
+          <label for="name" class="form-label">Name</label>
+          <input type="text" class="form-control" id="name" name="姓名" required>
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="email" name="Email" required>
+        </div>
+        <div class="mb-3">
+          <label for="message" class="form-label">Text</label>
+          <textarea class="form-control" id="message" rows="4" name="訊息" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Send</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}
