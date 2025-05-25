@@ -1,72 +1,88 @@
 {% extends "base.html" %}
 {% block title %}ATP Binding Sites Predictor{% endblock %}
 
-{% block hero %}
-  <div class="hero-section text-white text-center">
-    <h1 class="hero-title">ATP Binding Sites Predictor</h1>
-    <h2 class="hero-subtitle">A web server for predicting ATP binding sites in protein sequences using classifiers and deep learning</h2>
-  </div>
+{% block head %}
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 {% endblock %}
 
 {% block content %}
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      <div class="alert alert-success" role="alert">
-        {{ messages[0] }}
-      </div>
-    {% endif %}
-  {% endwith %}
+<div class="container py-5 mt-5">
 
-    <div class="mb-5">
-      <h3>Introduction</h3>
-      <p>This project aims to address the inefficiencies and high costs associated with experimentally identifying ATP binding sites in protein sequences. 
-        We developed a web-based prediction platform that leverages deep learning techniques to automatically identify potential ATP binding sites from raw protein sequences. 
-        This tool supports research in structural biology and drug discovery by improving early-stage target screening efficiency and reducing laboratory workload.
+  <!-- Introduction -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <h3 class="card-title">
+        <i class="bi bi-lightbulb me-2"></i> Introduction
+      </h3>
+      <p class="card-text">
+        This project focuses on predicting ATP binding sites within protein sequences. 
       </p>
     </div>
+  </div>
 
-    <div class="mb-5">
-      <h3>Approach</h3>
-      <p>Our approach integrates advanced deep learning models to enhance prediction accuracy. Specifically, 
-        we employ Convolutional Neural Networks (CNN) for spatial feature extraction, the Evolutionary Scale Modeling (ESM) protein language model for capturing evolutionary context, 
-        and the Mamba architecture for efficient sequence modeling. These models are trained on curated datasets derived from publicly available protein structure and function databases. 
-        The development process includes data preprocessing, model training and validation, user interface prototyping, and multiple rounds of usability testing. 
-        The result is an intuitive and powerful tool for ATP binding site prediction.</p>
-    </div>
-
-    <div class="mb-5">
-      <h3>Dataset</h3>
-      <p>All the dataset are searched from Uniprot. If you are trying to train your model with the same dataset, please check the link below.</p>
-      <p><a href="https://rest.uniprot.org/uniprotkb/stream?download=true&format=fasta&query=%28%28go%3A0005524%29+AND+%28fragment%3Afalse%29+AND+%28keyword%3AKW-0813%29+AND+%28reviewed%3Atrue%29+AND+%28existence%3A1%29%29"; style="text-decoration: none; color: #6bcdfe;">FASTA</a> , <a href="https://rest.uniprot.org/uniprotkb/stream?download=true&format=json&query=%28%28go%3A0005524%29+AND+%28fragment%3Afalse%29+AND+%28keyword%3AKW-0813%29+AND+%28reviewed%3Atrue%29+AND+%28existence%3A1%29%29"; style="text-decoration: none; color: #6bcdfe;">Json</a></p>
-    </div>
-
-    <div class="mb-5">
-      <h3>Member</h3>
-      <ul>
-        <li>1111437 張原翔</li>
-        <li>1111535 陳奕宏</li>
-        <li>1111537 簡至揚</li>
-        <li>1113314 蔣碩文</li>
-      </ul>
-    </div>
-
-    <div class="mb-5">
-      <h3>Contact us</h3>
-<form method="post" action="{{ url_for('contact') }}">
-        <div class="mb-3">
-          <label for="name" class="form-label">Name</label>
-          <input type="text" class="form-control" id="name" name="姓名" required>
-        </div>
-        <div class="mb-3">
-          <label for="email" class="form-label">Email</label>
-          <input type="email" class="form-control" id="email" name="Email" required>
-        </div>
-        <div class="mb-3">
-          <label for="message" class="form-label">Text</label>
-          <textarea class="form-control" id="message" rows="4" name="訊息" required></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary">Send</button>
-      </form>
+  <!-- Approach -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <h3 class="card-title">
+        <i class="bi bi-cpu me-2"></i> Approach
+      </h3>
+      <p class="card-text">
+        Feature extraction is performed using Position-Specific Scoring Matrix (PSSM), binary encoding, and sliding window techniques. 
+        A combination of machine learning models including Random Forest and XGBoost. We also used deep learning model such as ESM, MAMBA, and MSCNN are employed to enhance prediction accuracy. 
+        The results are visualized and presented through a web-based interface for ease of access and interpretation.
+      </p>
     </div>
   </div>
+
+  <!-- Dataset -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <h3 class="card-title">
+        <i class="bi bi-journal-code me-2"></i> Dataset
+      </h3>
+      <p class="card-text">
+        All the dataset are searched from Uniprot. If you are trying to train your model with the same dataset, please check the links below:
+      </p>
+      <div class="d-flex gap-2 flex-wrap">
+        <a class="btn btn-outline-primary" href="https://rest.uniprot.org/uniprotkb/stream?download=true&format=fasta&query=..." target="_blank">
+          <i class="bi bi-file-earmark-text me-1"></i> Download FASTA
+        </a>
+        <a class="btn btn-outline-info" href="https://rest.uniprot.org/uniprotkb/stream?download=true&format=json&query=..." target="_blank">
+          <i class="bi bi-braces-asterisk me-1"></i> Download JSON
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Visualization Images Section -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <h3 class="card-title">
+        <i class="bi bi-diagram-3 me-2"></i> Architecture Overview
+      </h3>
+      <p class="card-text">
+        The website predicting tool combines sequence analysis and machine learning methods to predict ATP binding sites in transport protein sequences. 
+        The flow chart includes different steps of traditional machine learning, deep learning, and PLM.
+      </p>
+
+      <!-- Responsive image grid -->
+      <div class="row g-3">
+        <div class="col-md-4">
+          <img src="{{ url_for('static', filename='img/ml.png') }}" alt="ML flow" class="img-fluid rounded shadow-sm">
+          <p class="mt-2 text-center">img</p>
+        </div>
+        <div class="col-md-4">
+          <img src="{{ url_for('static', filename='img/esm.png') }}" alt="DL flow" class="img-fluid rounded shadow-sm">
+          <p class="mt-2 text-center">esm</p>
+        </div>
+        <div class="col-md-4">
+          <img src="{{ url_for('static', filename='img/mamba.png') }}" alt="PLM flow" class="img-fluid rounded shadow-sm">
+          <p class="mt-2 text-center">mamba</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
 {% endblock %}

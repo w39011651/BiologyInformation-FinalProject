@@ -27,21 +27,28 @@ def contact():
                   body=f"姓名: {name}\nEmail: {email}\n\n訊息:\n{message}")
     mail.send(msg)
     flash("您的訊息已成功送出，我們會盡快與您聯繫。")
-    return redirect(url_for('index'))
+    return redirect(url_for('contactpage'))
 ######
 
 # 首頁
 @app.route('/')
+def homepage():
+    return render_template('homepage.html')
+
+@app.route('/index')
 def index():
     return render_template('index.html')
 
-from ATP_Mamba import runner
+@app.route('/contact')
+def contactpage():
+    return render_template('contact.html')
+
 from multiprocessing import Queue, Process
 
-def run_atp_mamba(protein_information):
+def run_isolated(model_runner, protein_information):
     q = Queue()
     def wrapper(protein_information, q):
-        out = runner.run(protein_information)
+        out = model_runner(protein_information)
         q.put(out)
     p = Process(target=wrapper, args=(protein_information, q))
     p.start()
@@ -49,6 +56,7 @@ def run_atp_mamba(protein_information):
     result = q.get()
     return result
 
+import ATP_Mamba.runner
 import ATP_ESM.runner
 import ATP_RF_PSSM.runner
 import ATP_msCNN.runner
@@ -66,19 +74,19 @@ def predictpage():
         print(f"Selected model: {selected_model_value}")
 
         if selected_model_value == "rfpssm":
-            result = ATP_RF_PSSM.runner.run_rf_pssm(fasta_input)
+            result = run_isolated(ATP_RF_PSSM.runner.run_rf_pssm, fasta_input)
         elif selected_model_value == "rfbm":
-            result = ATP_RF_BM.runner.run_rf_bm(fasta_input)
+            result = run_isolated(ATP_RF_BM.runner.run_rf_bm, fasta_input)
         elif selected_model_value == "mscnnpssm":
-            result = ATP_msCNN.runner.run_mscnn_pssm(fasta_input)
+            result = run_isolated(ATP_msCNN.runner.run_mscnn_pssm, fasta_input)
         elif selected_model_value == "xgbpssm":
-            result = ATP_XGB_PSSM.runner.run_xgb_pssm(fasta_input)
+            result = run_isolated(ATP_XGB_PSSM.runner.run_xgb_pssm, fasta_input)
         elif selected_model_value == "xgbbm":
-            result = ATP_XGB_BM.runner.run_xgb_bm(fasta_input)
+            result = run_isolated(ATP_XGB_BM.runner.run_xgb_bm, fasta_input)
         elif selected_model_value == "mamba":
-            result = run_atp_mamba(fasta_input)
+            result = run_isolated(ATP_Mamba.runner.run, fasta_input)
         elif selected_model_value == "esm":
-            result = ATP_ESM.runner.run_esm(fasta_input)
+            result = run_isolated(ATP_ESM.runner.run_esm, fasta_input)
         else:
             result = "Invalid model selected or model not handled."
             
