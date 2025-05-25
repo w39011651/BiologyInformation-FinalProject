@@ -1,23 +1,31 @@
 import numpy as np
-import joblib
-from .preprocess import sequence_to_sliding_windows
-from .model_loader import load_rf_model
+from ATP_RF_BM.preprocess import sequence_to_sliding_windows
 
-def predict_binding_sites(sequence, model_path, window_size=15):
-    """
-    sequence: str, 單條蛋白質序列
-    model_path: str, RF模型的pkl路徑
-    """
-    # 特徵處理
-    window_features, center_indices = sequence_to_sliding_windows(sequence, window_size=window_size)
-    if len(window_features) == 0:
-        print("序列長度太短無法做sliding window")
-        return []
-    # 扁平成RF輸入格式
-    X = np.array([w.flatten() for w in window_features])
-    model = load_rf_model(model_path)
+def predict(seq, primary_accession, model):
+    bm_submatrix_list = sequence_to_sliding_windows(seq, 15)
+    X = np.array([w.flatten() for w in bm_submatrix_list])
     y_pred = model.predict(X)  # 0/1
-    # 收集所有預測為1的中心index
-    binding_site_indices = [center_indices[i] for i, pred in enumerate(y_pred) if pred == 1]
-    print("Binding sites (index):", binding_site_indices)
-    return binding_site_indices
+
+    binding_site_indices = [i for i, pred in enumerate(y_pred) if pred == 1]
+
+    all_protein_results = {}
+
+    all_protein_results[primary_accession] = {
+                "atp_binding_site_indices": binding_site_indices,
+                "num_predicted_binding_sites": len(binding_site_indices)
+            }
+    print("\nAll predictions complete.")
+    return all_protein_results
+
+def output(all_protein_results):
+    return_str = ''
+    for protein_id, data in all_protein_results.items():
+        print(f"Protein: {protein_id},", end=' ')
+        return_str += f"Protein: {protein_id}, "
+        if len(data['atp_binding_site_indices']) == 0:
+            print("No ATP Binding Site is predicted here.")
+            return_str += "No ATP Binding Site is predicted here.\n"
+        else:
+            print("Predicted ATP Binding Sites: {data['atp_binding_site_indices']}")
+            return_str += f"Predicted ATP Binding Sites: {data['atp_binding_site_indices']}\n"
+    return return_str
