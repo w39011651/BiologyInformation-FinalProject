@@ -2,34 +2,7 @@ import torch
 from torch.utils.data import Dataset
 from tqdm import tqdm
 
-import numpy as np
-
-def get_pssm(file):
-    pssm_data = []
-    with open(file) as f:
-        lines = f.readlines()
-        for i, line in enumerate(lines):
-            if line.strip().startswith('1'):#PSSM列為index, aminoacid, PSSM row vector，這邊使用startswith('1')代表PSSM從這邊開始
-                start = i#記錄下第幾列開始
-                break
-        if start is None:
-            raise ValueError("Cannot find the begin position of the PSSM, Check the format of the output file")
-        
-        for line in lines[start:]:
-            parts = line.split()
-
-            if len(parts) < 22:
-                break#不符合格式
-
-            scores = list(map(int, parts[2:22]))
-            nomalization = lambda x:1/(1+np.exp(-x))#Sigmoid Function
-            scores = [nomalization(int(score)) for score in parts[2:22]]
-            pssm_data.append(scores)
-    
-    pssm_array = np.array(pssm_data)
-    pssm_array = np.array(pssm_array.tolist(), dtype=np.float32)
-    return pssm_array
-        
+import numpy as np   
 
 def get_binding_site(features):
   binding_site = []
@@ -73,7 +46,17 @@ def sliding_window(matrix, labels, window_size = 15):
     matrix_windows = sliding_window_for_matrix(matrix, window_size = window_size)
     return {"matrix":matrix_windows, "label":label_windows}
 
-class ATPBindingDataset(Dataset):
+def one_hot_encoding(sequence):
+  binary_matrix = []
+  amino_acids = 'ACDEFGHIKLMNPQRSTVWY'
+  for aa in sequence:
+    encoding = [0] * len(amino_acids)
+    if aa in amino_acids:
+      encoding[amino_acids.index(aa)] = 1
+    binary_matrix.append(encoding)
+  return binary_matrix
+
+class ATPBindingDataset_BM(Dataset):
     def __init__(self, proteins_data):
         super().__init__()
         matrices, labels = self.__convert_to_submatrix__(proteins_data)
@@ -89,13 +72,13 @@ class ATPBindingDataset(Dataset):
             pos = get_binding_site(feature)
             labels = generate_label(protein, pos)
 
-            matrix = get_pssm(f'Test/{primaryAccession}.pssm')
+            #matrix = get_pssm(f'drive/MyDrive/bio-final/sequences/{primaryAccession}.txt')
+            matrix = one_hot_encoding(protein['sequence']['value'])
 
             ret = sliding_window(matrix, labels)
-            
+
             if not len(ret['matrix']) == len(ret['label']):
-                #raise ValueError(f"The shape is not equal\nthe shape of matrix:{len(ret['matrix'])}\nthe shape of label:{len(ret['label'])}")
-                continue
+                raise ValueError(f"The shape is not equal\nthe shape of matrix:{len(ret['matrix'])}\nthe shape of label:{len(ret['label'])}")
             ret_matrics += ret['matrix']
             ret_labels += ret['label']
         return ret_matrics, ret_labels
