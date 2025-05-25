@@ -3,7 +3,7 @@ from tqdm import tqdm
 import torch.nn.functional as F
 import numpy as np
 
-from predict.preprocess import process_single_protein
+from ATP_msCNN.preprocess import process_single_protein
 
 def predict(model, pssms_id_list):
     device = "cuda" if torch.cuda.is_available() else "cpu"

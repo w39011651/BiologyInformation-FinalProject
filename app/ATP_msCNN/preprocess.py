@@ -1,4 +1,4 @@
-import predict.ATP_Dataset as ATP_Dataset
+import ATP_msCNN.ATP_Dataset as ATP_Dataset
 import torch
 
 def process_single_protein(protein_id, file_folder):

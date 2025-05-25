@@ -1,7 +1,7 @@
-from predict.fasta_utils import make_fasta
-from predict.pssm_generator import make_pssm
-from predict.model_loader import load_model
-from predict.predictor import predict, output
+from ATP_msCNN.fasta_utils import make_fasta
+from ATP_msCNN.pssm_generator import make_pssm
+from ATP_msCNN.model_loader import load_model
+from ATP_msCNN.predictor import predict, output
 
 
 def run(protein_information):
