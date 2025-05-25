@@ -3,31 +3,54 @@
 {% block title %}FASTA Predict Page{% endblock %}
 
 {% block content %}
-<h2>FASTA Prediction Demo</h2>
+<div class="mt-5" style="padding-top: 100px;">
+  <h2>FASTA Prediction</h2>
 
-<form method="POST">
-    <div>
-        <br>
-        <label for="model-select">Select Model: </label>
+<div class="d-flex flex-row gap-5 align-items-start">
 
-        <select name="model" id="model-select" required>
-        <option value="" disabled selected>Please Select Your Model</option>
-        <option value="rfpssm">Random Forest - PSSM</option>
-        <option value="rfbm">Random Forest - Binary Matrix</option>
-        <option value="mscnnpssm">MSCNN - PSSM</option>
-        <option value="xgbpssm">XGBoost - PSSM</option>
-        <option value="xgbbm">XGBoost - Binary Matrix</option>
-        <option value="mamba">Mamba</option>
-        <option value="esm">Esm</option>
+  <!-- 左側輸入區 -->
+  <div style="flex: 1;">
+    <form method="POST">
+      <div class="mb-3">
+        <label for="model-select" class="form-label">Select Model: </label>
+        <select name="model" id="model-select" class="form-select" required>
+            <option value="" disabled selected>Please Select Your Model</option>
+            <option value="rfpssm">Random Forest - PSSM</option>
+            <option value="rfbm">Random Forest - Binary Matrix</option>
+            <option value="mscnnpssm">MSCNN - PSSM</option>
+            <option value="xgbpssm">XGBoost - PSSM</option>
+            <option value="xgbbm">XGBoost - Binary Matrix</option>
+            <option value="mamba">Mamba</option>
+            <option value="esm">Esm</option>
         </select>
-        <br><br>
-    </div>
-    <textarea name="fasta_input" rows="10" cols="50" placeholder=">Protein\nMSTNPKPQRKTKRNTNRRP..."></textarea><br><br>
-    <input type="submit" value="Send">
-</form>
+      </div>
 
-{% if result %}
-    <h3>Prediction Result:</h3>
-    <p>{{ result }}</p>
-{% endif %}
+      <div class="mb-3">
+        <textarea name="fasta_input" rows="10" class="form-control"
+                  placeholder=">Protein\nMSTNPKPQRKTKRNTNRRP...                            Only one protein sequence can be uploaded"></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Send</button>
+    </form>
+  </div>
+
+  <!-- 右側結果區（即使沒結果也留空） -->
+  <div style="flex: 1;">
+    <h4 class="mb-3">Prediction Result</h4>
+    <div class="card border-primary bg-light">
+      <div class="card-body">
+        {% if result %}
+          <pre style="white-space: pre-wrap; word-break: break-word; font-family: monospace;">
+{{ result }}
+          </pre>
+        {% else %}
+          <p class="text-muted">Prediction results will appear here after submission.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</div>
 {% endblock %}

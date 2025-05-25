@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>陽光生物科技數據流</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #f0f9ff;
+      font-family: 'Courier New', monospace;
+      color: #2a7f8f;
+    }
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+    .content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: #2a7f8f;
+      text-shadow: 0 0 10px rgba(42, 127, 143, 0.3);
+    }
+    h1 {
+      font-size: 3em;
+      margin-bottom: 20px;
+    }
+    button {
+      background: transparent;
+      color: #2a7f8f;
+      border: 2px solid #2a7f8f;
+      padding: 12px 24px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.3s;
+      margin-top: 20px;
+    }
+    button:hover {
+      background: rgba(42, 127, 143, 0.1);
+      box-shadow: 0 0 15px rgba(42, 127, 143, 0.3);
+    }
+    
+    /* 細胞背景圖案 */
+    .cell-pattern {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      opacity: 0.05;
+      background-image: radial-gradient(circle, #2a7f8f 1px, transparent 1px);
+      background-size: 30px 30px;
+    }
+      .content {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 讓按鈕水平置中，可依需求調整 */
+    gap: 10px; /* 按鈕之間的間距 */
+  }
+
+   a.button-link {
+    display: inline-block;
+    width: 200px;
+    padding: 10px;
+    font-size: 16px;
+    text-align: center;
+    background-color: #63bcc6;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+  }
+
+  a.button-link:hover {
+    background-color: #4595a0;
+  }
+  </style>
+</head>
+<body>
+  <div class="cell-pattern"></div>
+  <canvas id="dnaRain"></canvas>
+  
+  <div class="content">
+    <h1>ATP Predictor</h1>
+    <p>A web server for predicting ATP binding sites in protein sequences using classifiers and deep learning</p>
+         <a href="{{ url_for('index') }}" class="button-link">Introduction</a>
+        <a href="{{ url_for('predictpage') }}" class="button-link">Start Predict</a>
+        <a href="{{ url_for('weblogo') }}" class="button-link">WebLogo</a>
+          <a href="{{ url_for('contact') }}" class="button-link">Contact Us</a>
+  </div>
+
+  <script>
+    // 生物科技相關字符集
+    const aminoAcids = "ACDEFGHIKLMNPQRSTVWY"; // 20種標準氨基酸
+    const dnaBases = "ATCG"; // DNA鹼基
+    const proteinSequences = [
+      "MALWMRLLPLLALLALWGPDPAAAFVNQHLCGSHLVEALYLVCGERGFFYTPKTRREAED",
+      "MVHLTPEEKSAVTALWGKVNVDEVGGEALGRLLVVYPWTQRFFESFGDLSTPDAVMGNPK",
+      "MKWVTFISLLLLFSSAYSRGVFRRDAHKSEVAHRFKDLGEENFKALVLIAFAQYLQQCPF"
+    ];
+    
+    const canvas = document.getElementById('dnaRain');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    // 設置陽光色調
+    const colors = ['#2a7f8f', '#3a9faf', '#4abfcf', '#5adfef'];
+    
+    // 創建雨滴
+    const fontSize = 16;
+    const columns = canvas.width / fontSize;
+    const drops = [];
+    
+    // DNA雙螺旋結構
+    const dnaHelices = [];
+    const dnaImages = [];
+    
+    // 預加載DNA圖像
+    function preloadDNAImages() {
+      for (let i = 0; i < 3; i++) {
+        const img = new Image();
+        img.src = generateDNAImage();
+        dnaImages.push(img);
+      }
+    }
+    
+    // 生成簡單的DNA圖像
+    function generateDNAImage() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 80;
+      canvas.height = 120;
+      const ctx = canvas.getContext('2d');
+      
+      // 繪製DNA雙螺旋
+      ctx.strokeStyle = `rgba(42, 127, 143, ${0.3 + Math.random() * 0.3})`;
+      ctx.lineWidth = 1;
+      
+      // 主鏈
+      ctx.beginPath();
+      for (let y = 0; y < canvas.height; y += 5) {
+        const x = 20 + Math.sin(y / 10) * 15;
+        if (y === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      
+      ctx.beginPath();
+      for (let y = 0; y < canvas.height; y += 5) {
+        const x = 60 + Math.sin(y / 10 + Math.PI) * 15;
+        if (y === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      
+      // 鹼基對
+      for (let y = 10; y < canvas.height; y += 10) {
+        const x1 = 20 + Math.sin(y / 10) * 15;
+        const x2 = 60 + Math.sin(y / 10 + Math.PI) * 15;
+        ctx.beginPath();
+        ctx.moveTo(x1, y);
+        ctx.lineTo(x2, y);
+        ctx.stroke();
+      }
+      
+      return canvas.toDataURL();
+    }
+    
+    // 初始化雨滴
+    for (let i = 0; i < columns; i++) {
+      drops[i] = {
+        y: Math.random() * -canvas.height,
+        speed: 2 + Math.random() * 5,
+        length: 10 + Math.floor(Math.random() * 20),
+        sequence: generateBioSequence()
+      };
+    }
+    
+    // 初始化DNA雙螺旋
+    for (let i = 0; i < 5; i++) {
+      dnaHelices.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        scale: 0.5 + Math.random(),
+        speed: 0.2 + Math.random() * 0.5,
+        opacity: 0.3 + Math.random() * 0.3,
+        image: null
+      });
+    }
+    
+    // 預加載DNA圖像
+    preloadDNAImages();
+    
+    // 生成生物序列
+    function generateBioSequence() {
+      // 30%概率使用真實蛋白質序列片段
+      if (Math.random() < 0.3) {
+        return proteinSequences[Math.floor(Math.random() * proteinSequences.length)]
+          .substring(0, 10 + Math.floor(Math.random() * 20));
+      }
+      
+      // 70%概率隨機生成序列
+      let seq = "";
+      const len = 10 + Math.floor(Math.random() * 20);
+      for (let i = 0; i < len; i++) {
+        seq += Math.random() < 0.7 ? aminoAcids[Math.floor(Math.random() * aminoAcids.length)] 
+                                  : dnaBases[Math.floor(Math.random() * dnaBases.length)];
+      }
+      return seq;
+    }
+    
+    // 繪製函數
+    function draw() {
+      // 半透明背景製造拖尾效果
+      ctx.fillStyle = 'rgba(240, 249, 255, 0.2)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // 設置字體
+      ctx.font = `${fontSize}px 'Courier New', monospace`;
+      
+      // 繪製DNA雙螺旋
+      dnaHelices.forEach(helix => {
+        if (dnaImages.length > 0 && helix.image === null) {
+          helix.image = dnaImages[Math.floor(Math.random() * dnaImages.length)];
+        }
+        
+        if (helix.image) {
+          ctx.globalAlpha = helix.opacity;
+          ctx.drawImage(
+            helix.image, 
+            helix.x, 
+            helix.y, 
+            helix.image.width * helix.scale, 
+            helix.image.height * helix.scale
+          );
+          ctx.globalAlpha = 1;
+        }
+        
+        // 移動DNA雙螺旋
+        helix.y += helix.speed;
+        if (helix.y > canvas.height) {
+          helix.y = -150;
+          helix.x = Math.random() * canvas.width;
+          helix.scale = 0.5 + Math.random();
+          helix.opacity = 0.3 + Math.random() * 0.3;
+        }
+      });
+      
+      // 繪製每個雨滴
+      for (let i = 0; i < drops.length; i++) {
+        const x = i * fontSize;
+        const drop = drops[i];
+        
+        // 繪製序列中的每個字符
+        for (let j = 0; j < drop.sequence.length; j++) {
+          const charY = drop.y + j * fontSize;
+          if (charY > 0 && charY < canvas.height) {
+            // 越往下顏色越淡
+            const opacity = 0.7 - (j / drop.sequence.length * 0.5);
+            const colorIndex = Math.min(Math.floor(j / 5), colors.length - 1);
+            ctx.fillStyle = `rgba(42, 127, 143, ${opacity})`;
+            ctx.fillText(drop.sequence[j], x, charY);
+          }
+        }
+        
+        // 移動雨滴
+        drop.y += drop.speed;
+        
+        // 重置雨滴位置
+        if (drop.y - drop.sequence.length * fontSize > canvas.height) {
+          drop.y = Math.random() * -100;
+          drop.sequence = generateBioSequence();
+          drop.speed = 2 + Math.random() * 5;
+        }
+      }
+    }
+    
+    // 處理窗口大小變化
+    window.addEventListener('resize', function() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const newColumns = canvas.width / fontSize;
+      
+      // 調整雨滴數組
+      if (newColumns > drops.length) {
+        // 增加新雨滴
+        for (let i = drops.length; i < newColumns; i++) {
+          drops[i] = {
+            y: Math.random() * -canvas.height,
+            speed: 2 + Math.random() * 5,
+            length: 10 + Math.floor(Math.random() * 20),
+            sequence: generateBioSequence()
+          };
+        }
+      } else if (newColumns < drops.length) {
+        // 移除多餘雨滴
+        drops.length = newColumns;
+      }
+      
+      // 調整DNA雙螺旋位置
+      dnaHelices.forEach(helix => {
+        helix.x = Math.random() * canvas.width;
+        helix.y = Math.random() * canvas.height;
+      });
+    });
+    
+    // 啟動動畫
+    setInterval(draw, 50);
+  </script>
+</body>
+</html>
