@@ -29,7 +29,6 @@ def get_pssm(file):
     pssm_array = np.array(pssm_data)
     pssm_array = np.array(pssm_array.tolist(), dtype=np.float32)
     return pssm_array
-        
 
 def get_binding_site(features):
   binding_site = []
@@ -89,13 +88,12 @@ class ATPBindingDataset(Dataset):
             pos = get_binding_site(feature)
             labels = generate_label(protein, pos)
 
-            matrix = get_pssm(f'Test/{primaryAccession}.pssm')
+            matrix = get_pssm(f'Test/{primaryAccession}.txt')
 
             ret = sliding_window(matrix, labels)
-            
+
             if not len(ret['matrix']) == len(ret['label']):
-                #raise ValueError(f"The shape is not equal\nthe shape of matrix:{len(ret['matrix'])}\nthe shape of label:{len(ret['label'])}")
-                continue
+                raise ValueError(f"The shape is not equal\nthe shape of matrix:{len(ret['matrix'])}\nthe shape of label:{len(ret['label'])}")
             ret_matrics += ret['matrix']
             ret_labels += ret['label']
         return ret_matrics, ret_labels
