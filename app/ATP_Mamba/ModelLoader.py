@@ -1,7 +1,7 @@
 import torch
 from ATP_Mamba import MambaModel
 
-def load_model(model_weight_path = '/app/atp_binding_model.pt'):
+def load_model(model_weight_path = '/app/mamba_atp_binding_model.pt'):
     device = "cuda" #Mamba must use cuda
     model = MambaModel.LCPLMforSequenceLabeling("/app/LC-PLM", num_labels = 2)
     state_dict = torch.load(model_weight_path, map_location="cpu")
