@@ -11,8 +11,10 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-RUN git clone https://github.com/amazon-science/LC-PLM.git && mv LC-PLM app/
+#RUN git clone https://github.com/amazon-science/LC-PLM.git && mv LC-PLM app/ You can choose origin repository, it would have n_layer=48
+RUN git clone https://github.com/w39011651/LC-PLM.git && mv LC-PLM app/
 #預設從github上clone下來
+#The repository which forked from LC-PLM, it would have n_layer=8
 
 RUN pip install gdown
 
