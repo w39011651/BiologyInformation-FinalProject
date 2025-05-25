@@ -1,0 +1,11 @@
+tqdm
+numpy
+flask
+biopython
+scikit-learn
+Flask-Mail
+triton==2.3.1
+transformers==4.51.3
+joblib
+torch
+xgboost

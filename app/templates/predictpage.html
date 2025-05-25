@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}FASTA Predict Page{% endblock %}
+
+{% block content %}
+<h2>FASTA Prediction Demo</h2>
+
+<form method="POST">
+    <div>
+        <br>
+        <label for="model-select">Select Model: </label>
+
+        <select name="model" id="model-select" required>
+        <option value="" disabled selected>Please Select Your Model</option>
+        <option value="rfpssm">Random Forest - PSSM</option>
+        <option value="rfbm">Random Forest - Binary Matrix</option>
+        <option value="mscnnpssm">MSCNN - PSSM</option>
+        <option value="xgbpssm">XGBoost - PSSM</option>
+        <option value="xgbbm">XGBoost - Binary Matrix</option>
+        <option value="mamba">Mamba</option>
+        <option value="esm">Esm</option>
+        </select>
+        <br><br>
+    </div>
+    <textarea name="fasta_input" rows="10" cols="50" placeholder=">Protein\nMSTNPKPQRKTKRNTNRRP..."></textarea><br><br>
+    <input type="submit" value="Send">
+</form>
+
+{% if result %}
+    <h3>Prediction Result:</h3>
+    <p>{{ result }}</p>
+{% endif %}
+{% endblock %}

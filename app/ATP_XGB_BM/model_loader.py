@@ -1,0 +1,7 @@
+import joblib
+import os
+
+def load_xgb_model(model_path = 'xgb_with_bm_model.pkl'):
+    if not os.path.exists(model_path):
+        raise FileNotFoundError(f"Model file {model_path} not found.")
+    return joblib.load(model_path)
