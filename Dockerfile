@@ -27,7 +27,7 @@ RUN git clone https://github.com/w39011651/LC-PLM.git /app/LC-PLM
 
 RUN pip install gdown
 
-RUN gdown --id 1Jc5YRHPSnbrSf33-A-LeokZMptShCU89 -O app/atp_binding_model.pt
+RUN gdown --id 1Jc5YRHPSnbrSf33-A-LeokZMptShCU89 -O app/mamba_atp_binding_model.pt
 
 WORKDIR /app
 
