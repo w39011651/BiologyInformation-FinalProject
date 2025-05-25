@@ -1,5 +1,5 @@
 import torch
-import predict.ATP_Model as ATP_Model
+import cnn_with_bm.ATP_Model as ATP_Model
 
 def load_model(model_weight_path = "atp_binding_model.pt"):
     device = "cuda" if torch.cuda.is_available() else "cpu"

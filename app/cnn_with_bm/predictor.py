@@ -3,36 +3,36 @@ from tqdm import tqdm
 import torch.nn.functional as F
 import numpy as np
 
-from predict.preprocess import process_single_protein
+from cnn_with_bm.preprocess import process_single_protein
 
-def predict(model, pssms_id_list):
+def predict(model, protein_info_list):
     device = "cuda" if torch.cuda.is_available() else "cpu"
     all_protein_results = {}
 
     SEQ_LEN = 15
-    BEST_THRESHOLD = np.float32(0.732)#The best threshold for the highest MCC score in test phase when the model was training
+    BEST_THRESHOLD = np.float32(0.742)#The best threshold for the highest MCC score in test phase when the model was training
 
     model.eval()
     with torch.no_grad():
-        for protein_id in tqdm(pssms_id_list):
-            protein_window_tensor, original_pssm = process_single_protein(protein_id, '.')
+        for primary_accession, sequence in tqdm(protein_info_list):
+            protein_window_tensor, bm_matrix = process_single_protein(sequence, 15)
             #protein_window_tensor: torch.tensor() for every window in the matrix
 
-            protein_window_tensor = protein_window_tensor.to(device)
+            protein_window_tensor = protein_window_tensor.unsqueeze(1).to(device)
 
             window_logits = model(protein_window_tensor)
 
             window_probs = F.softmax(window_logits, dim=1)[:,1].cpu().numpy()
             #The probability of "is ATP binding site"
 
-            sequence_length = original_pssm.shape[0]
+            sequence_length = bm_matrix.shape[0]
             residue_probs_sum = np.zeros(sequence_length, dtype=np.float32)#儲存每個殘基的機率總和
             residue_coverage_count = np.zeros(sequence_length, dtype=np.int32)#儲存每個殘基被覆蓋的次數
 
             center_offset = SEQ_LEN//2
 
             for i, prob in enumerate(window_probs):
-                center_residue_idx = i + center_offset#0 for the first window, 1 for the second window
+                center_residue_idx = i + center_offset #0 for the first window, 1 for the second window
                 residue_probs_sum[center_residue_idx] += prob
                 residue_coverage_count[center_residue_idx] += 1
             
@@ -47,7 +47,7 @@ def predict(model, pssms_id_list):
 
             atp_binding_site_indices = np.where(residue_prediction == 1)[0].tolist()
 
-            all_protein_results[protein_id] = {
+            all_protein_results[primary_accession] = {
                 "sequence_length": sequence_length,
                 "residue_avg_probs": residue_average_probs.tolist(),
                 "residue_predictions": residue_prediction.tolist(),
