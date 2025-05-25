@@ -21,7 +21,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 #RUN git clone https://github.com/amazon-science/LC-PLM.git && mv LC-PLM app/ You can choose origin repository, it would have n_layer=48
-RUN git clone https://github.com/w39011651/LC-PLM.git && mv LC-PLM app/
+RUN git clone https://github.com/w39011651/LC-PLM.git /app/LC-PLM
 #預設從github上clone下來
 #The repository which forked from LC-PLM, it would have n_layer=8
 
@@ -42,4 +42,8 @@ COPY ./app /app
 
 EXPOSE 5000
 #CMD ["ls", "predict"]
+
+RUN ls -al /app/LC-PLM
+#Ensure that LC-PLM is under /app/
+
 CMD ["python", "website_demo.py"]
