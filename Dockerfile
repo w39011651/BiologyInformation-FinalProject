@@ -1,6 +1,6 @@
 # ------------------------------------------------------------------------------
 # 本 Docker 建構過程會自動 clone 下列第三方程式碼：
-#   來源：https://github.com/thirdparty/cc-by-nc-code
+#   來源：https://github.com/amazon-science/LC-PLM?tab=License-1-ov-file
 #   授權：CC BY-NC 4.0（創用CC姓名標示-非商業性4.0國際授權條款）
 # 
 # 請注意，該部分內容僅能用於非商業用途，併同原作者授權條款一併遵守。
