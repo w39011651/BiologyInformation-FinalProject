@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template
-import predict.runner
+import ATP_XGB_PSSM.runner
 
 app = Flask(__name__)
 
@@ -9,7 +9,7 @@ def index():
     if request.method == 'POST':
         fasta_input = request.form['fasta_input']
         print(fasta_input)
-        result = predict.runner.run(fasta_input)
+        result = ATP_XGB_PSSM.runner.run(fasta_input)
         
     return render_template('index.html', result=result)
 

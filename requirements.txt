@@ -4,3 +4,4 @@ flask
 biopython
 scikit-learn
 Flask-Mail
+xgboost
