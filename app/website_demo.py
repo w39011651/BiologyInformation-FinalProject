@@ -45,6 +45,7 @@ def contactpage():
 
 from multiprocessing import Queue, Process
 
+
 def run_isolated(model_runner, protein_information):
     q = Queue()
     def wrapper(protein_information, q):
@@ -71,6 +72,8 @@ def predictpage():
     if request.method == 'POST':
         fasta_input = request.form['fasta_input']
         selected_model_value = request.form['model']
+        user_email = request.form.get('user_email', '').strip()
+
         print(f"Selected model: {selected_model_value}")
 
         if selected_model_value == "rfpssm":
@@ -89,8 +92,21 @@ def predictpage():
             result = run_isolated(ATP_ESM.runner.run_esm, fasta_input)
         else:
             result = "Invalid model selected or model not handled."
-            
+
+        # ========== Email 寄送 ==========
+        if user_email:
+            try:
+                msg = Message(subject="您的 FASTA 預測結果",
+                              sender=app.config['MAIL_USERNAME'],
+                              recipients=[user_email],
+                              body=f"您好，以下是您所提交的 FASTA 預測結果：\n\nModel: {selected_model_value}\n\n{result}")
+                mail.send(msg)
+                flash(f'預測結果已成功寄送至 {user_email}！')
+            except Exception as e:
+                flash(f'Email 傳送失敗：{str(e)}')
+
     return render_template('predictpage.html', result=result, model=selected_model_value)
+
 
 #######
 import os
