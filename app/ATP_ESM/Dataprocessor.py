@@ -9,9 +9,6 @@ def ATPtokenize(tokenizer, protein_sequence):
     """
     encoding = tokenizer(
         protein_sequence,
-        padding = 'max_length',
-        truncation = True,
-        max_length = 512,
         return_tensors = 'pt'
     )
     return{'input_ids':encoding['input_ids'].squeeze(0), 'attention_mask':encoding['attention_mask'].squeeze(0)}

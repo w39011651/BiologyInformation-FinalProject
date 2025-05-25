@@ -38,13 +38,38 @@ class focal_loss(nn.Module):
         else:
             raise ValueError("reduction 必須是 'mean', 'sum' 或 'none'")
         
+class CustomClassifier(nn.Module):
+    def __init__(self, hidden_size, num_labels, fc_hidden_size = 500, dropout_rate = 0.5):
+        super().__init__()
+        self.hidden_size = hidden_size
+        self.num_labels = num_labels
+        self.fc_hidden_size = fc_hidden_size
+        self.bn = nn.BatchNorm1d(self.hidden_size)
+        self.fc1 = nn.Linear(self.hidden_size, self.fc_hidden_size)
+        self.fc1_bn = nn.BatchNorm1d(self.fc_hidden_size)
+        self.dropout = nn.Dropout(p=dropout_rate)
+        self.fc_out = nn.Linear(self.fc_hidden_size, self.num_labels)
+        self.relu = nn.ReLU()
+    
+    def forward(self, x):
+        batch, seq_len, hidden = x.shape
+        x = x.view(-1, hidden)
+        x = self.bn(x)
+        x = self.fc1(x)
+        x = self.fc1_bn(x)
+        x = self.relu(x)
+        x = self.dropout(x)
+        x = self.fc_out(x)
+        x = x.view(batch, seq_len, -1)
+        return x
+        
 
 class EsmForSequenceLabeling(nn.Module):
     def __init__(self, model_name, num_labels=2):
         super(EsmForSequenceLabeling, self).__init__()
         self.esm = AutoModelForMaskedLM.from_pretrained(model_name, trust_remote_code=True)
 
-        self.classifier = nn.Linear(self.esm.config.hidden_size, num_labels)
+        self.classifier = CustomClassifier(self.esm.config.hidden_size, num_labels)
         self.loss_fn = focal_loss(alpha=0.8, gamma=2.0).to("cuda")
 
     def forward(self, input_ids, attention_mask=None, labels=None):

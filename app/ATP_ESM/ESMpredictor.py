@@ -22,7 +22,7 @@ def predict(model, data, threshold = 0.333):
         pred_labels = (probs > threshold).astype(int).flatten()
 
         atp_binding_site = np.where(pred_labels == 1)[0].tolist()
-
+        print(atp_binding_site)
         return atp_binding_site
     
 def output(protein_id, data):
@@ -35,10 +35,8 @@ def output(protein_id, data):
     print(f"Protein: {protein_id},", end=' ')
     return_str += f"Protein: {protein_id}, "
     if len(data) == 0:
-        print("No ATP Binding Site is predicted here.")
         return_str += "No ATP Binding Site is predicted here.\n"
     else:
-        print("Predicted ATP Binding Sites: {data['atp_binding_site_indices']}")
         return_str += f"Predicted ATP Binding Sites: {data}\n"
-
+    print(return_str)
     return return_str

@@ -30,3 +30,4 @@ def run(protein_information):
     torch.cuda.empty_cache()
 
     return output
+

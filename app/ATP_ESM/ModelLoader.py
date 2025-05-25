@@ -1,7 +1,8 @@
 import torch
 from ATP_ESM import ESMModel
+import os
 
-def load_model(model_weight_path = "esm_atp_binding_model.pt"):
+def load_model(model_weight_path = "/app/esm_atp_binding_model.pt"):
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model = ESMModel.EsmForSequenceLabeling("facebook/esm2_t6_8M_UR50D", 2)
     model.to(device)
