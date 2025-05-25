@@ -26,6 +26,8 @@ def output(all_protein_results):
             print("No ATP Binding Site is predicted here.")
             return_str += "No ATP Binding Site is predicted here.\n"
         else:
-            print("Predicted ATP Binding Sites: {data['atp_binding_site_indices']}")
-            return_str += f"Predicted ATP Binding Sites: {data['atp_binding_site_indices']}\n"
+            # 這裡將每個 index 都加 7
+            shifted_indices = [idx + 7 for idx in data['atp_binding_site_indices']]
+            print(f"Predicted ATP Binding Sites: {shifted_indices}")
+            return_str += f"Predicted ATP Binding Sites: {shifted_indices}\n"
     return return_str
