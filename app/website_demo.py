@@ -1,17 +1,18 @@
 #from flask import Flask, request, render_template
 from flask import Flask, request, render_template, redirect, url_for, flash
 from flask_mail import Mail, Message
+import json
 app = Flask(__name__)
 ######
 app.secret_key = 'abcccc45678'  # for flash message
 
 # 郵件設定
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
+app.config['MAIL_SERVER'] = ''
+app.config['MAIL_PORT'] = 0
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'tc930512@gmail.com'
+app.config['MAIL_USERNAME'] = ''
 #應用程式密碼
-app.config['MAIL_PASSWORD'] = 'vjiorcljmhcyhuzl'
+app.config['MAIL_PASSWORD'] = ''
 
 mail = Mail(app)
 ######
@@ -163,6 +164,18 @@ def weblogo():
             flash(f'Email 傳送失敗：{str(e)}')
 
     return render_template('weblogo.html', logo_path=logo_path)
+
+def setup_email_config():
+    global app
+    # 郵件設定
+    with open('secret.json') as f:
+        email_config = json.load(f)
+    app.config['MAIL_SERVER'] = email_config['mail_server']
+    app.config['MAIL_PORT'] = email_config['mail_port']
+    app.config['MAIL_USE_TLS'] = email_config['mail_use_tls']
+    app.config['MAIL_USERNAME'] = email_config['mail_username']
+    #應用程式密碼
+    app.config['MAIL_PASSWORD'] = email_config['mail_password']
 
 
 if __name__ == '__main__':
